@@ -1,0 +1,7 @@
+﻿@model CoreApp.Models.TienDoModel
+@(Html.Kendo().DropDownListFor(m => m)
+            .DataValueField("giaTriTienDo")
+            .DataTextField("tenTienDo")
+            .DataSource(d => d.Read(r => r.Action("GetAllTienDo", "QuanLyCongViec"))
+            )
+)

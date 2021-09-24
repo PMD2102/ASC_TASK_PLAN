@@ -1,0 +1,57 @@
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <br />
+                    @(Html.Kendo().DropDownList()
+                        .Name("dropdownlist")
+                        .DataTextField("Text")
+                        .DataValueField("Value")
+                        .BindTo(new List<SelectListItem>() {
+                            new SelectListItem() {
+                                Text = "Hồ sơ người dùng",
+                                Value = "1"
+                            },
+                            new SelectListItem() {
+                                Text = "Đổi mật khẩu",
+                                Value = "2"
+                            },
+                            new SelectListItem() {
+                                Text = "Đăng xuất",
+                                Value = "3"
+                            }
+                        })
+                    .Value("1")
+                    .HtmlAttributes(new {style="float :right; background-image: none;"})
+                    )
+
+                    <span style="float: right;">@TempData["TenNhanSu"] </span>
+                    <img  style="float: right;"/> 
+            <center> 
+                <h3> 
+                    <img src="~/images/asc_logo.png" width="100px" height="40px" style="margin-left: 140px;"/> <span style="margin-left: 40px;"> ASC TASK PLANNING  </span>
+                    <br/>
+                    <br/>
+                    HỆ THỐNG QUẢN LÝ CÔNG VIỆC 
+                    
+                </h3>
+                <br/>
+                <a href=""> Quản lí công việc  | </a> <a href=""> Tuần làm việc  | </a> <a href=""> Báo cáo hiệu suất công việc  | </a> <a href=""> Phân bổ công việc </a>
+            </center>
+            
+        </div>
+
+    </div>
+</div>
+
+<script> 
+    $( document ).ready(function() {
+    $("span").removeClass("k-dropdown-wrap k-state-default");
+    const removeElements = (elms) => elms.forEach(el => el.remove());
+    removeElements( document.querySelectorAll(".k-input") );
+    });
+
+    
+    
+
+</script>

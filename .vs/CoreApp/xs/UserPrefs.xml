@@ -1,0 +1,37 @@
+﻿<Properties StartupConfiguration="{4F5A6671-0A22-4042-8A5B-3C0F67D7143C}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CoreApp/Views/ThongKe/TrangChu.cshtml">
+    <Files>
+      <File FileName="CoreApp/Views/ThongKe/TrangChu.cshtml" Line="23" Column="44" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="CoreApp" expanded="True">
+            <Node name="CoreApp" expanded="True">
+              <Node name="Controllers" expanded="True" />
+              <Node name="Models" expanded="True" />
+              <Node name="Service" expanded="True" />
+              <Node name="Views" expanded="True">
+                <Node name="ACLNguoiDung" expanded="True" />
+                <Node name="QuanLyCongViec" expanded="True" />
+                <Node name="ThongKe" expanded="True">
+                  <Node name="TrangChu.cshtml" selected="True" />
+                </Node>
+              </Node>
+              <Node name="wwwroot" expanded="True">
+                <Node name="images" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.CoreApp PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

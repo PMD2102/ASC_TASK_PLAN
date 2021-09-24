@@ -1,0 +1,8 @@
+﻿@model CoreApp.Models.TrangThaiCongViecModel
+
+@(Html.Kendo().DropDownListFor(m => m)
+            .DataValueField("giaTriTrangThai")
+            .DataTextField("tenTrangThai")
+            .DataSource(d => d.Read(r => r.Action("GetAllTrangThai", "QuanLyCongViec"))
+            )
+)

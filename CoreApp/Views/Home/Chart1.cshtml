@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Chart";
+}
+
+<div class="container-fluid">
+    <div class='row my-4'>
+        <div class='col-12 col-lg-9 border-right'>
+            @(Html.Kendo().Chart()
+                .Name("chart")
+                .Theme("sass")
+                .Legend(legend => legend
+                    .Position(ChartLegendPosition.Bottom)
+                )
+                .Series(series => {
+                    series.Pie(new dynamic[] {                        
+                        new { category = "Europe", value = 0.3 },
+                        new { category = "North America", value = 0.23 },
+                        new { category = "Australia", value = 0.18 },
+                        new { category = "Asia", value = 0.15 },
+                        new { category = "South America", value = 0.09 },
+                        new { category = "Africa", value = 0.05 }
+                    })
+                    .AutoFit()
+                    .Connectors(c=>c.Color("transparent"))
+                    .Labels(labels => labels
+                        .Distance(30)
+                        .Position(ChartSeriesLabelsPosition.Above)
+                        .Format("{0:p0}")
+                        .Visible(true)
+                    );
+                })
+            )
+        </div>
+        <div class='col-12 col-lg-3 mt-3 mt-lg-0'>
+            <h3>Telerik UI for ASP.NET Core Chart</h3>
+            <p>
+                The Telerik UI for ASP.NET Core Charts provide high quality graphical data visualization options.
+            </p>
+            <p>
+                They include a variety of chart types and styles that have extensive configuration options. 
+            </p>
+            <p>
+                The Telerik UI for ASP.NET Core Chart Component is rendered completely through JavaScript, making it server-platform agnostic and boosting the performance of your application.
+
+                By default the Core Chart control is powered by Scalable Vector Graphics (SVG), enabling animations and interactivity in modern browsers with a fallback to Vector Markup Language (VML) for older browsers. Canvas rendering is also supported when a higher fps rate is required for frequent/live data updates.
+            </p>
+        </div>
+    </div>
+</div>

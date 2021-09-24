@@ -1,0 +1,55 @@
+﻿
+<div data-role="grid" class="k-grid k-widget k-grid-display-block">
+
+    <table name="gridThongKe">
+        <thead class="k-grid-header" role="rowgroup">
+            <tr class="k-master-row">
+                <th class="k-grid-header" colspan="2" role="columnheader"> Thống kê theo tháng <br /> </th>
+                @for (int i = 0; i < ViewBag.DanhSachTuan.Count; i++)
+                {
+                    <th class="k-grid-header" colspan="2" role="columnheader"> @ViewBag.DanhSachTuan[i].TenTuan <br />  @ViewBag.DanhSachTuan[i].TuNgay.Date.ToString("dd/MM") - @ViewBag.DanhSachTuan[i].DenNgay.Date.ToString("dd/MM")</th>
+                }
+            </tr>
+
+        </thead>
+        <tbody role="rowgroup">
+            <tr class="k-master-row">
+                <th class="k-grid-header" role="columnheader"> STT </th>
+                <th class="k-grid-header" role="columnheader"> Nhân Sự</th>
+                @for (int i = 0; i < ViewBag.DanhSachTuan.Count; i++)
+                {
+                    <th class="k-grid-header">Số giờ</th>
+                    <th class="k-grid-header">% Hoàn Thành</th>
+
+                }
+            </tr>
+
+            @for (int j = 0; j < ViewBag.SoLuongNhanSu; j++)
+            {
+                int stt = j;
+                int stt1 = j + 1;
+                <tr class="k-master-row" role="row">
+                    <td> @stt1</td>
+                    <td> @ViewBag.DanhSachThongKe[j].tenNhanVien</td>
+                    @for (int k = 0; k < ViewBag.DanhSachTuan.Count; k++)
+                    {
+
+
+                        @if (ViewBag.DanhSachThongKe[stt].idTuan == ViewBag.DanhSachTuan[k].Id)
+                        {
+                            float hoanThanh = ((float)ViewBag.DanhSachThongKe[stt].soGioLam / ViewBag.DanhSachTuan[k].SoGioLam) * 100;
+                            <td> @ViewBag.DanhSachTuan[k].SoGioLam </td>
+                            <td> @hoanThanh </td>
+                            stt += ViewBag.SoLuongNhanSu;
+
+
+                        }
+                    }
+
+                </tr>
+            }-->
+            @*<div class="k-pager-wrap k-grid-pager k-widget k-floatwrap k-pager-sm" data-role="pager"><a href="#" aria-label="Go to the first page" title="Go to the first page" class="k-link k-pager-nav k-pager-first k-state-disabled" data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-end-left"></span></a><a href="#" aria-label="Go to the previous page" title="Go to the previous page" class="k-link k-pager-nav  k-state-disabled" data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-60-left"></span></a><div class="k-pager-numbers-wrap"><select class="k-dropdown"><option value="1" selected="selected">1</option></select><ul class="k-pager-numbers"><li><span class="k-link k-state-selected">1</span></li></ul></div><a href="#" aria-label="Go to the next page" title="Go to the next page" class="k-link k-pager-nav  k-state-disabled" data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-60-right"></span></a><a href="#" aria-label="Go to the last page" title="Go to the last page" class="k-link k-pager-nav k-pager-last k-state-disabled" data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-end-right"></span></a><span class="k-pager-sizes k-label"><span title="" class="k-widget k-dropdown" unselectable="on" role="listbox" aria-haspopup="listbox" aria-expanded="false" tabindex="0" aria-owns="461a6943-6626-4f37-8a3d-a6bf598c9c91_listbox" aria-live="polite" aria-disabled="false" aria-readonly="false" aria-busy="false" aria-activedescendant="0a5a101e-dc02-4c44-9cd1-33413b143e5d" style=""><span unselectable="on" class="k-dropdown-wrap k-state-default"><span id="0a5a101e-dc02-4c44-9cd1-33413b143e5d" unselectable="on" role="option" aria-selected="true" class="k-input">10</span><span unselectable="on" class="k-select" aria-label="select"><span class="k-icon k-i-arrow-60-down"></span></span></span><select data-role="dropdownlist" style="display: none;" aria-label="10"><option value="5">5</option><option value="10" selected="selected">10</option><option value="20">20</option></select></span>items per page</span><a href="#" class="k-pager-refresh k-link" title="Refresh" aria-label="Refresh"><span class="k-icon k-i-reload"></span></a><span class="k-pager-info k-label">1 - 4 of 4 items</span></div>*@
+        </tbody>
+    </table>
+</div>
+

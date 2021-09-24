@@ -1,0 +1,69 @@
+﻿@{
+}
+<div class="modal" id="myModalDanhGia" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Đánh giá nhân sự </h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col12">
+                            <span> Tháng * :</span>
+                            @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistThangTrongNamDanhGia")
+                                .DataTextField("TenThang")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllThang", "Thang");
+                                    });
+
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 30px;" })
+                            )
+
+                        <span style="margin-left : 40px;"> Nhân sự :@ViewBag.idNhanVien </span>
+                            <span id="tenNV" name="tenNV">  </span>
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col12">
+                            <span> Đánh giá công việc tháng </span>
+                            <hr style="width:400px;">
+                            <br />
+                            @(Html.Kendo().Grid<CoreApp.Models.eDanhGiaCVThangModel>()
+                                .Name("GridDanhGia")
+                                .Columns(columns =>
+                                    {
+                                        columns.Bound(thang => thang.tenThang).Title("Tên tháng");
+                                        columns.Bound(thang => thang.KhoiLuongModel).ClientTemplate("#=KhoiLuongModel.tenKhoiLuong#").Title("Khối lượng");
+                                        columns.Bound(thang => thang.TienDoModel).ClientTemplate("#=TienDoModel.tenTienDo#").Title("Tiến độ");
+                                        columns.Bound(thang => thang.ChatLuongThangModel).ClientTemplate("#=ChatLuongThangModel.tenChatLuongThang#").Title("Chất lượng");
+                                        columns.Bound(thang => thang.nhanXetThang).Title("Nhận xét tháng");
+                                    }
+                                    )
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(10)
+                                .ServerOperation(false)
+                                .Model(model => {
+                                    model.Id( m => m.idThang);
+
+                                }).Read(read => read.Action("PhatSinhTuanTheoThang","Tuan")))
+                                .Pageable(page => page.PageSizes(true).Refresh(true))
+                                .Sortable()
+                                .Resizable(resize => resize.Columns(true))
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

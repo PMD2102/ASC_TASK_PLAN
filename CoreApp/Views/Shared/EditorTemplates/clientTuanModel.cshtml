@@ -1,0 +1,7 @@
+﻿@model CoreApp.Models.ChatLuongTuanModel
+@(Html.Kendo().DropDownListFor(m => m)
+            .DataValueField("giaTriChatLuongTuan")
+            .DataTextField("tenChatLuongTuan")
+            .DataSource(d => d.Read(r => r.Action("GetAllChatLuongTuan", "QuanLyCongViec"))
+            )
+)

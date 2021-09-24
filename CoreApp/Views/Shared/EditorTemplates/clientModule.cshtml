@@ -1,0 +1,7 @@
+﻿@model CoreApp.Models.eDmModuleModel
+@(Html.Kendo().DropDownListFor(m => m)
+            .DataValueField("Id")
+            .DataTextField("TenModule")
+            .DataSource(d => d.Read(r => r.Action("GetAllModule", "QuanLyCongViec"))
+            )
+)

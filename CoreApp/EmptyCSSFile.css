@@ -1,0 +1,283 @@
+﻿$.ajax({
+            url: "@Url.Action("danhSachIdNhanSu", "NhanSu")",
+            type: "POST",
+            data:{ idThang: $("#dropdownlistThangTrongNamIndex").val(), idTuan: $("#dropdownlistTuanIndex").val()},
+            success: function (res) {
+                console.log("asdasd "+res[0]);
+                var listId = res;
+                console.log("danh sach " + listId.length);
+                $(".k-grouping-row").each(function (e) {
+                    var current = $(this).closest(".k-grouping-row");
+                    //var k = current;
+
+                    //current.prepend("<td> <input type='checkbox'/> </td>");
+                    var ele = document.createElement("input");
+                    ele.type = "checkbox";
+                    ele.classList.add("abc");
+                    console.log("list id :" + listId[i]);
+                    ele.setAttribute("id", `${listId[i]}`);
+                    current.children("td")[0].prepend(ele);
+
+
+                    var grid = $("#grid1").data("kendoGrid");
+                    var rows = grid.items();
+                    var row = rows[i];
+                    var dataItem = grid.dataItem(row);
+                    if (dataItem.isDaDuyet == true) {
+                        document.getElementById(`${listId[i]}`).checked = true;
+                    }
+
+                    i++;
+                    //document.getElementById("myCheck").checked = true;
+                    //document.getElementById("myCheck").disabled = true;
+                    //console.log(current.children("td")[1]);
+
+        });
+            }
+        })
+data-toggle="modal" data-target="#myModal"
+var grid2 = $("#grid1").data("kendoGrid");
+@*$(rows1).each(function (e) {
+                var row1 = this;
+                var dataItem1 = grid2.dataItem(row);
+
+                if (dataItem1.isDaDuyet == true) {
+                    console.log("dataItem 1 va idNhanVien : " + dataItem1.isDaDuyet + " - " + dataItem1.idNhanVien);
+                    document.getElementById(`${dataItem1.idNhanVien}`).checked = true;
+
+                    
+                        }
+                else {
+                    console.log("dataItem 1 va idNhanVien : " + dataItem1.isDaDuyet + " - " + dataItem1.idNhanVien);
+                }
+            })*@
+
+@*var checkbox = $(row).find("input[type=checkbox]");
+$(checkbox).hide();*@
+
+
+
+
+@(Html.Kendo().Grid<CoreApp.Models.eDanhGiaCVTuanModel>()
+                                .Name("GridDanhGia")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(thang => thang.tenTuan).Title("Tên tuần");
+                                    columns.Bound(thang => thang.KhoiLuongModel).ClientTemplate("#=KhoiLuongModel.tenKhoiLuong#").Title("Khối lượng");
+                                    columns.Bound(thang => thang.TienDoModel).ClientTemplate("#=TienDoModel.tenTienDo#").Title("Tiến độ");
+                                    columns.Bound(thang => thang.ChatLuongTuanModel).ClientTemplate("#=ChatLuongTuanModel.tenChatLuongTuan#").Title("Chất lượng");
+                                    columns.Bound(thang => thang.nhanXetTuan).Title("Nhận xét tuần");
+                                }
+                                    )
+                                .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(10)
+                                .ServerOperation(false)
+                                .Model(model => {
+                                    model.Id( m => m.idTuan);
+
+                                }).Read(read => read.Action("DanhGiaCongViecTuan", "QuanLyCongViec").Data("ReadDanhGiaTuan")))
+                                .Pageable(page => page.PageSizes(true).Refresh(true))
+                                .Sortable()
+                                .Resizable(resize => resize.Columns(true))
+                            )
+
+
+public List<eDanhGiaCVTuanModel > DanhGiaCongViecTuan(int idThang, int idNhanSu) {
+    using (var context = new ASC_TASK_PLANNINGContext())
+
+{
+    var danhSachNhanSu = context.NsNhanSus.Where(ns => ns.Id == idNhanSu).ToList();
+    var danhSachCongViecThang = context.CvCongViecThangs.Where(cvthang => cvthang.Idthang == idThang).ToList();
+    var danhSachCongViecTuan = context.CvCongViecTuans.ToList();
+    //var danhSachCongViecTuan = context.CvCongViecTuans.Where(cvTuan => cvTuan.Idtuan == idTuan).ToList();
+    string tenThang = context.DmThangs.Where(thang => thang.Id == idThang).Select(thang => thang.TenThang).FirstOrDefault();
+    List <eDanhGiaCVTuanModel> listDanhGiaThang = new List<eDanhGiaCVTuanModel>();
+    var query = (from ns in danhSachNhanSu
+                             join cvthang in danhSachCongViecThang on ns.Id equals cvthang.IdnhanSu
+                             join cvt in danhSachCongViecTuan on cvthang.Id equals cvt.IdcongViecThang
+                             where ns.Id == idNhanSu && cvthang.Idthang == idThang
+                             select new eDanhGiaCVTuanModel
+                             {
+                                 idTuan = cvt.Idtuan,
+                                 tenTuan = "",
+                                 KhoiLuongModel = cvt.EnumKhoiLuong == 0 ? new KhoiLuongModel(cvt.EnumKhoiLuong, "Bình tường") : cvt.EnumKhoiLuong == 1 ? new KhoiLuongModel(cvt.EnumKhoiLuong, "Nhiều") : new KhoiLuongModel(cvt.EnumKhoiLuong, "Thấp"),
+                                 TienDoModel = cvt.EnumTienDo == 0 ? new TienDoModel(cvt.EnumTienDo, "Kịp tiến độ") : cvt.EnumTienDo == 1 ? new TienDoModel(cvt.EnumTienDo, "Sớm hơn KH") : new TienDoModel(cvt.EnumTienDo, "Trễ tiến độ"),
+                                 ChatLuongTuanModel = cvt.EnumChatLuong == 0 ? new ChatLuongTuanModel(cvt.EnumChatLuong, "<= 2 lỗi nội bộ triển khai test") : cvt.EnumChatLuong == 1 ? new ChatLuongTuanModel(cvt.EnumChatLuong, "3 -> 4 lỗi nội bộ triển khai test") : cvt.EnumChatLuong == 2 ? new ChatLuongTuanModel(cvt.EnumChatLuong, "> 4 lỗi nội bộ hoặc <= 2 lỗi khách báo cáo") : cvt.EnumChatLuong==3 ? new ChatLuongTuanModel(cvt.EnumChatLuong, "Lỗi nghiêm trọng phía khách hàng") : new ChatLuongTuanModel(4," "),
+                                 nhanXetTuan = cvt.NhanXetTuan
+                             }).ToList();
+    query .ForEach(x => {
+                    listDanhGiaThang.Add(x);
+
+                });
+    for (int i = 0; i < listDanhGiaThang.Count; i++)
+
+{
+    if (listDanhGiaThang.Count == 1) break;
+    listDanhGiaThang .Remove(listDanhGiaThang[i]);
+}
+
+return listDanhGiaThang;
+}
+}
+}
+
+<script src="http://code.jquery.com/jquery-1.9.1.min.js" > </script >
+
+
+.pagination {
+    list-style: none !important;
+    display: inline-block !important;
+    padding: 0 !important;
+    margin-top: 10px !important;
+}
+
+.pagination li {
+    display: inline !important;
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center !important;
+}
+
+
+.pagination a {
+    color: red !important;
+    width: 10px;
+    height: 20px;
+}
+
+.modal-1 a:hover {
+    background: #eee !important;
+}
+
+
+<div class="container" >
+<div class="row" style=" border: 1px solid black; height: 80px; " >
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+<div class="solid" >
+<span style="margin-left:20px; margin-top:50px;" > Năm : </span >
+@(Html.Kendo().DropDownList()
+                    .Name("dropdownlistNam")
+                    .DataTextField("tenNam")
+                    .DataValueField("nam")
+                    .DataSource(source => {
+                        source.Read(read =>
+                        {
+                            read.Action("DanhSachNamThongKe", "ThongKe");
+                        });
+                    })
+                    .HtmlAttributes(new { style = "margin-left : 60px; margin-top : 15px;" })
+                )
+<span style="margin-left:120px; margin-top:50px;" > Tháng : </span >
+@(Html.Kendo().DropDownList()
+                    .Name("dropdownlistThang")
+                    .DataTextField("TenThang")
+                    .DataValueField("GiaTri")
+                    .DataSource(source => source
+                        .Custom()
+                        .ServerFiltering(true)
+                        .Transport(transport => transport
+                        .Read(read =>
+                        {
+                            read.Action("DanhSachThangTrongNam", "Thang").Data("filterYear"); ;
+                        }))
+                        )
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("dropdownlistNam")
+                    .HtmlAttributes(new { style ="margin-left : 40px; margin-top : 15px;"})
+                )
+
+<button type="button" id="TimKiem" name="TimKiem" class="k-button" style="margin-left:60px; margin-top:15px;" onclick="drawStuff()" > Tìm Kiếm </button >
+<br / >
+<br / >
+<br / >
+<br / >
+</div >
+</div >
+</div >
+<center >
+<div class="ex1" >
+<br / >
+<br / >
+<br / >
+<div id="chart_div" style="width: 1000px; height: 700px;" > </div >
+</div >
+</center >
+<br / >
+
+<div class="row" >
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+
+<div data-role="grid" class="k-grid k-widget k-grid-display-block" >
+
+<table name="gridThongKe" >
+<thead class="k-grid-header" role="rowgroup" >
+<tr class="k-master-row" id="testTuan" >
+<th class="k-grid-header" colspan="3" role="columnheader" > Thống kê theo tháng <br / > </th >
+@for (int i = 0; i < ViewBag.DanhSachTuan.Count; i++) {
+    <th class="k-grid-header" colspan="2" role="columnheader"> @ViewBag.DanhSachTuan[i].TenTuan <br /> @ViewBag.DanhSachTuan[i].TuNgay.Date.ToString("dd/MM") - @ViewBag.DanhSachTuan[i].DenNgay.Date.ToString("dd/MM") <span id=t-@ViewBag.DanhSachTuan[i].Id class="t" title="Tooltip content"> nhận xét </span></th>
+}
+
+</tr >
+
+</thead >
+<tbody role="rowgroup" >
+<thead >
+<tr class="k-master-row" id="testTuan1" >
+<th class="k-grid-header" role="columnheader" > STT </th >
+<th class="k-grid-header" role="columnheader" > Nhân Sự</th >
+<th class="k-grid-header" role="columnheader" > Nhận Xét Tháng</th >
+@for (int i = 0; i < ViewBag.DanhSachTuan.Count; i++) {
+    <th class="k-grid-header">Số giờ</th> <th class="k-grid-header">% Hoàn Thành</th>
+}
+
+</tr >
+</thead >
+
+<thead id="testTuan2" >
+@for (int j = 0; j < ViewBag.SoLuongNhanSu; j++) {
+    int stt = j;
+    int stt1 = j + 1;
+    <tr class="k-master-row" role="row"> <td> @stt1</td> <td> @ViewBag.DanhSachThongKe[j].tenNhanVien</td> <td> @ViewBag.DanhSachThongKe[j].nhanXetThang</td> @for (int k = 0; k < ViewBag.DanhSachTuan.Count; k++)
+
+{
+    @if (ViewBag.DanhSachThongKe[stt].idTuan == ViewBag.DanhSachTuan[k].Id) {
+        @if (ViewBag.DanhSachThongKe[stt].gioTrongTuan == 0) {
+            int hoanThanh = 0;
+            <td> @ViewBag.DanhSachThongKe[stt].gioTrongTuan </td> <td> @hoanThanh </td>
+        }
+
+        else {
+            float hoanThanh = ((float)ViewBag.DanhSachThongKe[stt].soGioLam / ViewBag.DanhSachThongKe[stt].gioTrongTuan) * 100;
+            <td> @ViewBag.DanhSachThongKe[stt].gioTrongTuan </td> <td> @hoanThanh </td>
+        }
+
+        stt += ViewBag.SoLuongNhanSu;
+    }
+}
+
+</tr >
+}
+</thead >
+
+</tbody >
+</table >
+
+</div >
+<div class="content_paging" >
+<ul class="pagination modal-1" >
+<li class="btn-prev btn-active fas fa-angel-left" > < </li >
+<div class="number-page" id="number-page" >
+
+</div >
+<li class="btn-next btn-active fas fa-angel-left" > > </li >
+</ul >
+</div >
+<br / >
+
+</div >
+</div >
+
+</div >

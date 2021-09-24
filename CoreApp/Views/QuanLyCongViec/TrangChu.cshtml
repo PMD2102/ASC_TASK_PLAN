@@ -1,0 +1,2081 @@
+﻿<style>
+
+
+    .abc {
+        margin-left: 34px;
+        z-index: 1;
+        position: absolute;
+        margin-top: 18px;
+        padding: 8px;
+    }
+
+    a.classTagA {
+        text-decoration: underline blue solid !important;
+        color: blue !important;
+        font-weight: normal !important;
+        cursor: pointer !important;
+    }
+
+    a {
+        padding: 24px;
+    }
+
+    .k-reset {
+        z-index: 0;
+        letter-spacing: 2px;
+    }
+
+    .modal {
+        text-align: center;
+        padding: 0 !important;
+    }
+
+        .modal:before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+            margin-right: -4px;
+        }
+
+    .modal-dialog {
+        display: inline-block;
+        text-align: left;
+        vertical-align: middle;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+            <br />
+            <h1> Quản Lý Công Việc </h1>
+        </div>
+
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 " style="margin-top: 10px;">
+            <br />
+            @(Html.Kendo().Button()
+                    .Name("Them")
+                    .Content("Thêm")
+                    .HtmlAttributes(new { type = "button", @class = "k-button", style="margin-left:100px;"})
+          )
+            @(Html.Kendo().Button()
+                    .Name("Xoa")
+                    .Content("Xóa")
+                    .HtmlAttributes(new { type = "button", @class = "k-button"})
+          )
+            @(Html.Kendo().Button()
+                    .Name("Luu")
+                    .Content("Lưu")
+                    .HtmlAttributes(new { type = "button", @class = "k-button" })
+          )
+            @(Html.Kendo().Button()
+                    .Name("DuyetKeHoachTuan")
+                    .Content("Duyệt kế hoạch tuần")
+                    .HtmlAttributes(new { type = "button", @class = "k-button" })
+          )
+            @(Html.Kendo().Button()
+                    .Name("KhoaMoTuan")
+                    .Content("Khoá / mở tuần")
+                    .HtmlAttributes(new { type = "button", @class = "k-button" })
+          )
+            @(Html.Kendo().Button()
+                    .Name("DoiCongViec")
+                    .Content("Dời công việc")
+                    .HtmlAttributes(new { type = "button", @class = "k-button" })
+          )
+            @*@(Html.Kendo().Button()
+                  .Name("XuatExcel")
+                  .Content("Xuất Excel")
+                  .HtmlAttributes(new { type = "button", @class = "k-button" })
+                )*@
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+    <div class="row" style=" border: 1px solid black; height: 80px; ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+            <span> Tháng : </span>
+            @(Html.Kendo().DropDownList()
+                .Name("dropdownlistThangTrongNamIndex")
+                .DataTextField("TenThang")
+                .DataValueField("Id")
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("GetAllThang", "Thang");
+                    });
+                })
+                .HtmlAttributes(new { style = "margin-left : 50px; margin-top:20px;" })
+             )
+            <span style="margin-left: 50px; margin-top: 50px;"> Tuần : </span>
+            @(Html.Kendo().DropDownList()
+                .Name("dropdownlistTuanIndex")
+                .DataTextField("TenTuan")
+                .DataValueField("Id")
+                .DataSource(source => source
+                    .Custom()
+                    .ServerFiltering(true)
+                    .Transport(transport => transport
+                    .Read(read =>
+                    {
+                        read.Action("DanhSachTuanTrongThang", "Tuan").Data("filterMonthIndex"); ;
+                    }))
+                    )
+                .Enable(false)
+                .AutoBind(false)
+                .CascadeFrom("dropdownlistThangTrongNamIndex")
+                .HtmlAttributes(new { style = "margin-left : 40px; margin-top:20px;" })
+              )
+
+
+            <button id="tim" name="tim" class="k-button" style="margin-top: 20px; margin-left: 240px;"> Tìm </button>
+            <button id="timNangCao" name="timNangCao" class="k-button" style="margin-top: 20px; margin-left: 10px;"> Tìm nâng cao </button>
+        </div>
+
+
+    </div>
+
+    <br />
+    <br />
+
+    <div id="testShow" name="testShow" class="row" style=" border: 1px solid black;height: 80px; ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+            <span>Module</span>
+            @(Html.Kendo().DropDownList()
+                .Name("dropdownlistModuleIndex")
+                .DataTextField("TenModule")
+                .DataValueField("Id")
+                .AutoBind(false)
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("GetDanhSachModule", "Module");
+                    });
+                })
+                .HtmlAttributes(new { style = "margin-left : 20px" })
+             )
+            <span style="margin-left: 20px; margin-top: 20px;">Tên công việc</span>
+            <input id="tenCongViecIndex" name="tenCongViecIndex" style="margin-top : 10px;" />
+
+            <span style="margin-left: 20px;">Nhân sự</span>
+            @(Html.Kendo().DropDownList()
+                .Name("dropdownlistNhanSuIndex")
+                .DataTextField("Ten")
+                .DataValueField("Id")
+                .AutoBind(false)
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("GetDanhSachNhanSu", "NhanSu");
+                    });
+                })
+                .HtmlAttributes(new { style = "margin-left : 10px; width: 100px" })
+            )
+            <span style="margin-left: 20px;">Trạng thái</span>
+            @(Html.Kendo().DropDownList()
+        .Name("dropdownlistLamViecIndex")
+        .DataTextField("Text")
+        .DataValueField("Value")
+        .AutoBind(false)
+        .BindTo(new List<SelectListItem>()
+        {
+                    new SelectListItem()
+                    {
+                        Text = "Đã xong",
+                        Value = "0"
+                    },
+                    new SelectListItem()
+                    {
+                        Text = "Chưa làm",
+                        Value = "1"
+                    },
+                    new SelectListItem()
+                    {
+                        Text = "Task đột xuất",
+                        Value = "2"
+                    },
+                    new SelectListItem()
+                    {
+                        Text = "Chưa xong",
+                        Value = "3"
+                    },
+                    new SelectListItem()
+                    {
+                        Text = "Bận task khác chưa duyệt",
+                        Value = "4"
+                    },
+                    new SelectListItem()
+                    {
+                        Text = "Bận task khác đã duyệt",
+                        Value = "5"
+                    },
+                    new SelectListItem()
+                    {
+                        Text = "Vắng",
+                        Value = "6"
+                    },
+
+
+        })
+        .Value("-1")
+
+
+)
+        </div>
+
+
+    </div>
+    <br />
+    <br />
+
+    @*<div class="row">
+        <div class="col12">*@
+
+    @(Html.Kendo().Grid<CoreApp.Models.eQuanLyCongViecModel>()
+        .Name("grid1")
+        .Columns(columns =>
+        {
+        //columns.Bound(c => c.tenNhanVien);
+            columns.Select().Width(50);
+            columns.Bound(c => c.eDmModuleModel).ClientTemplate("#=eDmModuleModel.TenModule#").Title("Module").Width(250);
+            columns.Bound(c => c.urlIssue).Title("Issue Url");
+            columns.Bound(c => c.tenCongViec).Title("Tên công việc").ClientGroupHeaderColumnTemplate("Tồng thời gian : #:thoiGianLam.sum# <br/> Mức độ hoàn thành : #=mucDoHoanThanh.sum/thoiGianLam.sum*100#%").Width(800);
+            columns.Bound(c => c.NguonGocModel).ClientTemplate("#=NguonGocModel.tenNguonGoc#").Title("Nguồn gốc").Width(40);
+            columns.Bound(c => c.thoiGianLam).Title("TG.làm").Width(40);
+            columns.Bound(c => c.mucDoHoanThanh).Title("Mức độ hoàn thành").Hidden();
+            columns.Bound(c => c.tuNgay).Title("Từ ngày").Format("{0:dd/MM}");
+            columns.Bound(c => c.denNgay).Title("Dến ngày").Format("{0:dd/MM}");
+            columns.Bound(c => c.TrangThaiCongViecModel).ClientTemplate("#=TrangThaiCongViecModel.tenTrangThai#").Title("Trạng thái").Width(400);
+            @*columns.Bound(c => c.idNhanVien)..ClientGroupHeaderColumnTemplate("<a href='" +
+        Url.Action("ProductDetails", "Product") +
+        "/#= idNhanVien #'" +
+    ">Show Product Details</a>").Hidden();*@
+            columns.Bound(c => c.ghiChu).Title("Ghi chú").Width(500);
+            @*columns.Command(command =>
+            {
+                command.Edit().Text(" ");
+
+            }).ClientHeaderTemplate("Sửa");*@
+            columns.Command(command =>
+            {
+                command.Custom("Cập nhật").Click("CapNhatPromo");
+
+            }).Title("Sửa");
+        })
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .HtmlAttributes(new { style = "height:550px;" })
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            //.Batch(true)
+            .PageSize(20)
+            .ServerOperation(false)
+            .Events(events => events.Error("errorHandler"))
+            .Aggregates(aggregates =>
+            {
+                aggregates.Add(p => p.thoiGianLam).Sum();
+                aggregates.Add(p => p.mucDoHoanThanh).Sum();
+            })
+            .Group(groups => {
+                groups.Add(p => p.Dev);
+            })
+            .Model(model =>
+            {
+                model.Id(p => p.idNhanVien);
+                //model.Id(p => p.idModule);
+                //model.Field(p => p.eDmModuleModel).DefaultValue(
+                //ViewData["defaultModule"] as CoreApp.Models.eDmModuleModel);
+                //model.Field(p => p.eDmModuleModel.Id).DefaultValue(ViewData["defaultModule"] as CoreApp.Models.eDmModuleModel);
+
+            })
+            .Read(read => read.Action("TimKiem", "QuanLyCongViec").Data("TimKiemIndex"))
+            .Update(read => read.Action("EditingCongViec_Update","QuanLyCongViec"))
+            )
+            .Events(e => {
+                e.Edit("onEdit");
+                e.DataBound("onDataBound");
+            })
+            .Pageable(page => page.PageSizes(true).Refresh(true))
+            .Sortable()
+            .Resizable(resize => resize.Columns(true))
+        )
+    @*</div>
+        </div>*@
+
+</div>
+
+
+
+<script type="text/javascript">function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    function onReadIdTuan() {
+        return {
+            idTuan: 1,
+            //idThang: $("#dropdownlistThangTrongNamIndex").val()
+        }
+    }</script>
+
+<!-- Popup cap nhat tuan lam viec-->
+<div class="modal" id="myModalCapNhat" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Popup cập nhật công việc </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col6">
+                            <span> Nhân sự * : </span>
+                        </div>
+                        <div class="col6">
+                            @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistNhanSuCapNhat")
+                                .DataTextField("Ten")
+                                .DataValueField("Id")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetDanhSachNhanSu", "NhanSu");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 40px" })
+
+                            )
+                            <br />
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col6">
+                        <span style="margin-left:15px;"> Tháng * : </span>
+                        @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistThangTrongNamCapNhat")
+                                .DataTextField("TenThang")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllThang", "Thang");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 50px" })
+                            )
+                    </div>
+
+                    <div class="col6">
+
+                        <span style="margin-left:50px;"> Tuần * :</span>
+
+                        @(Html.Kendo().DropDownList()
+                        .Name("dropdownlistTuanCapNhat")
+                        .DataTextField("TenTuan")
+                        .DataValueField("Id")
+                        .DataSource(source => source
+                            .Custom()
+                            .ServerFiltering(true)
+                            .Transport(transport => transport
+                            .Read(read =>
+                            {
+                                read.Action("DanhSachTuanTrongThang", "Tuan").Data("filterMonthCapNhat"); ;
+                            }))
+                            )
+                        .Enable(false)
+                        .AutoBind(false)
+                        .CascadeFrom("dropdownlistThangTrongNamCapNhat")
+                        .HtmlAttributes(new { style ="margin-left : 40px"})
+                    )
+                    </div>
+                    <br />
+                    <br />
+                    <hr style="width:70%;margin-left:15%">
+                    <br />
+                    <br />
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col6">
+                            <span style="margin-left:5px;"> Module : </span>
+                            @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistModuleCapNhat")
+                                .DataTextField("TenModule")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetDanhSachModule", "Module");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 50px" })
+                            )
+                        </div>
+
+                        <div class="col6" style="margin-left:50px;">
+                            <span> Nguồn : Tạo mới</span>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col6" style="margin-left:5px;">
+                            <span> Tên issuse : </span>
+                            <input type="text" id="tenIssusseCapNhat" name="tenIssusseCapNhat" style="margin-left:30px;" />
+                        </div>
+
+                        <div class="col6" style="margin-left:70px;">
+                            <span> Url issuse : </span>
+                            <input type="text" id="urlIssusseCapNhat" name="urlIssusseCapNhat" style="margin-left:30px;" />
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col12" style="margin-left:5px;">
+                            <span> Tên công việc : </span>
+                            <input type="text" id="tenCongViecCapNhat" name="tenCongViecCapNhat" style="margin-left:5px;width:535px;" />
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col6" style="margin-left:5px;">
+                            <span> Thời gian làm : </span>
+                            <input type="number" id="thoiGianLamCapNhat" name="thoiGianLamCapNhat" style="margin-left:5px;" min="1" max="50" />
+                        </div>
+
+                        <div class="col6" style="margin-left:5px;">
+                            <span style="margin-left:70px;"> Trạng thái : </span>
+                            @(Html.Kendo().DropDownList()
+                              .Name("dropdownlistLamViecCapNhat")
+                              .DataTextField("Text")
+                              .DataValueField("Value")
+                              .BindTo(new List<SelectListItem>() {
+                                  new SelectListItem()
+                                    {
+                                        Text = "Đã xong",
+                                        Value = "0"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Chưa làm",
+                                        Value = "1"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Task đột xuất",
+                                        Value = "2"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Chưa xong",
+                                        Value = "3"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Bận task khác chưa duyệt",
+                                        Value = "4"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Bận task khác đã duyệt",
+                                        Value = "5"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Vắng",
+                                        Value = "6"
+                                    },
+                              })
+                              .Value("1")
+                              .HtmlAttributes(new { style = "margin-left : 5px" })
+                            )
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col6" style="margin-left:5px;">
+                            <span>
+                                Từ ngày :
+                            </span>
+
+                            @(Html.Kendo().DatePicker()
+                                    .Name("tuNgayCapNhat")
+                                    .HtmlAttributes(new { style = "margin-left : 40px", title = "datepicker" }).Format("yyyy/MM/dd")
+                                )
+                        </div>
+
+                        <div class="col6" style="margin-left:55px;">
+                            <span>
+                                Đến ngày :
+                            </span>
+
+                            @(Html.Kendo().DatePicker()
+                                    .Name("denNgayCapNhat")
+                                    .HtmlAttributes(new { style = "margin-left : 5px", title = "datepicker" }).Format("yyyy/MM/dd")
+                                )
+                        </div>
+
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col12" style="margin-left:5px;">
+                            <span> Ghi chú : </span>
+                            <input type="text" id="ghiChuCapNhat" name="ghiChuCapNhat" style="margin-left:40px; width:560px;" />
+                            <input type="hidden" id="idGiaoViecCapNhat" name="idGiaoViecCapNhat" value="0" />
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <center>
+                                @(Html.Kendo().Button()
+                                .Name("LuuVaThemCapNhat")
+                                .Content("Lưu và thêm")
+                                .HtmlAttributes(new { type = "button", style = "margin-left : 20px", @class = "k-button" })
+                                )
+                                @(Html.Kendo().Button()
+                                .Name("LuuVaDongCapNhat")
+                                .Content("Lưu và đóng")
+                                .HtmlAttributes(new { type = "button", style = "margin-left : 20px", @class = "k-button" })
+                                )
+                                @(Html.Kendo().Button()
+                                .Name("DongCapNhat")
+                                .Content("Đóng")
+                                .HtmlAttributes(new { type = "button", style = "margin-left : 20px", @class = "k-button" })
+                                )
+                            </center>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Them/cap nhat tuan lam viec-->
+<div class="modal" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Popup thêm công việc </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col6">
+                            <span> Nhân sự * : </span>
+                        </div>
+                        <div class="col6">
+                            @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistNhanSu")
+                                .DataTextField("Ten")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetDanhSachNhanSu", "NhanSu");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 40px" })
+                            )
+                            <br />
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col6">
+                        <span style="margin-left:15px;"> Tháng * : </span>
+                        @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistThangTrongNam")
+                                .DataTextField("TenThang")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllThang", "Thang");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 50px" })
+                            )
+                    </div>
+
+                    <div class="col6">
+
+                        <span style="margin-left:50px;"> Tuần * :</span>
+
+                        @(Html.Kendo().DropDownList()
+                        .Name("dropdownlistTuan")
+                        .DataTextField("TenTuan")
+                        .DataValueField("Id")
+                        .DataSource(source => source
+                            .Custom()
+                            .ServerFiltering(true)
+                            .Transport(transport => transport
+                            .Read(read =>
+                            {
+                                read.Action("DanhSachTuanTrongThang", "Tuan").Data("filterMonth"); ;
+                            }))
+                            )
+                        .Enable(false)
+                        .AutoBind(false)
+                        .CascadeFrom("dropdownlistThangTrongNam")
+                        .HtmlAttributes(new { style ="margin-left : 40px"})
+                    )
+                    </div>
+                    <br />
+                    <br />
+                    <hr style="width:70%;margin-left:15%">
+                    <br />
+                    <br />
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col6">
+                            <span style="margin-left:5px;"> Module : </span>
+                            @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistModule")
+                                .DataTextField("TenModule")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetDanhSachModule", "Module");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 50px" })
+                            )
+                        </div>
+
+                        <div class="col6" style="margin-left:50px;">
+                            <span> Nguồn : Tạo mới</span>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col6" style="margin-left:5px;">
+                            <span> Tên issuse : </span>
+                            <input type="text" id="tenIssusse" name="tenIssusse" style="margin-left:30px;" />
+                        </div>
+
+                        <div class="col6" style="margin-left:70px;">
+                            <span> Url issuse : </span>
+                            <input type="text" id="urlIssusse" name="urlIssusse" style="margin-left:30px;" />
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col12" style="margin-left:5px;">
+                            <span> Tên công việc : </span>
+                            <textarea type="text" id="tenCongViec" name="tenCongViec" style="margin-left:5px;" rows="4" cols="50" required></textarea>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col6" style="margin-left:5px;">
+                            <span> Thời gian làm : </span>
+                            <input type="number" id="thoiGianLam" name="thoiGianLam"  style="margin-left:5px;" min="1" max="50" required/>
+                        </div>
+
+                        <div class="col6" style="margin-left:5px;">
+                            <span style="margin-left:70px;"> Trạng thái : </span>
+                            @(Html.Kendo().DropDownList()
+                              .Name("dropdownlistLamViec")
+                              .DataTextField("Text")
+                              .DataValueField("Value")
+                              .BindTo(new List<SelectListItem>() {
+                                  new SelectListItem()
+                                    {
+                                        Text = "Đã xong",
+                                        Value = "0"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Chưa làm",
+                                        Value = "1"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Task đột xuất",
+                                        Value = "2"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Chưa xong",
+                                        Value = "3"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Bận task khác chưa duyệt",
+                                        Value = "4"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Bận task khác đã duyệt",
+                                        Value = "5"
+                                    },
+                                    new SelectListItem()
+                                    {
+                                        Text = "Vắng",
+                                        Value = "6"
+                                    },
+                              })
+                              .Value("1")
+                              .HtmlAttributes(new { style = "margin-left : 5px" })
+                            )
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col6" style="margin-left:5px;">
+                            <span>
+                                Từ ngày :
+                            </span>
+
+                            @(Html.Kendo().DatePicker()
+                                    .Name("tuNgay")
+                                    .HtmlAttributes(new { style = "margin-left : 40px", title = "datepicker" }).Format("yyyy/MM/dd")
+                                )
+                        </div>
+
+                        <div class="col6" style="margin-left:55px;">
+                            <span>
+                                Đến ngày :
+                            </span>
+
+                            @(Html.Kendo().DatePicker()
+                                    .Name("denNgay")
+                                    .HtmlAttributes(new { style = "margin-left : 5px", title = "datepicker" }).Format("yyyy/MM/dd")
+                                )
+                        </div>
+
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col12" style="margin-left:5px;">
+                            <span> Ghi chú : </span>
+                            <input type="text" id="ghiChu" name="ghiChu" style="margin-left:40px; width:560px;" />
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <center>
+                                @(Html.Kendo().Button()
+                                .Name("LuuVaThem")
+                                .Content("Lưu và thêm")
+                                .HtmlAttributes(new { type = "button", style = "margin-left : 20px", @class = "k-button" })
+                                )
+                                @(Html.Kendo().Button()
+                                .Name("LuuVaDong")
+                                .Content("Lưu và đóng")
+                                .HtmlAttributes(new { type = "button", style = "margin-left : 20px", @class = "k-button" })
+                                )
+                                @(Html.Kendo().Button()
+                                .Name("Dong")
+                                .Content("Đóng")
+                                .HtmlAttributes(new { type = "button", style = "margin-left : 20px", @class = "k-button" })
+                                )
+                            </center>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popup dời công việc-->
+<div class="modal" id="myModalDoiCongViec" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Dời công việc </h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col6">
+                            <span style="margin-top:20px;">  Tháng * </span>
+                            @(Html.Kendo().DropDownList()
+                            .Name("dropdownlistThangTrongNamDoiCV")
+                            .DataTextField("TenThang")
+                            .DataValueField("Id")
+                            .DataSource(source => {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAllThang", "Thang");
+                                });
+                            })
+                            .HtmlAttributes(new { style = "margin-left : 50px; margin-top:20px;" })
+                         )
+                             <span style="margin-left: 50px; margin-top: 70px;"> Tuần : </span>
+                             @(Html.Kendo().DropDownList()
+                            .Name("dropdownlistTuanDoiCV")
+                            .DataTextField("TenTuan")
+                            .DataValueField("Id")
+                            .DataSource(source => source
+                                .Custom()
+                                .ServerFiltering(true)
+                                .Transport(transport => transport
+                                .Read(read =>
+                                {
+                                    read.Action("DanhSachTuanTrongThang", "Tuan").Data("filterMonthDoiCV");
+                                }))
+                                )
+                            .Enable(false)
+                            .AutoBind(false)
+                            .CascadeFrom("dropdownlistThangTrongNamDoiCV")
+                            .HtmlAttributes(new { style = "margin-left : 65px; margin-top:10px;" })
+                          )
+                            <br/>
+                            <br/>
+                        </div>
+
+                        <div class="col6">
+                            <span> Từ ngày * : </span>
+                            @(Html.Kendo().DatePicker()
+                                    .Name("tuNgayDoiCV")
+                                    .HtmlAttributes(new { style = "margin-left : 30px", title = "datepicker" }).Format("yyyy/MM/dd")
+                                )
+                            <span style="margin-left: 45px; margin-top: 50px;"> Đến ngày : </span>
+                            @(Html.Kendo().DatePicker()
+                                    .Name("denNgayDoiCV")
+                                    .HtmlAttributes(new { style = "margin-left : 40px;margin-top:10px; height : 35px;", title = "datepicker" }).Format("yyyy/MM/dd")
+                                )
+                            <br/>
+                            <br/>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col12">
+                            <center>
+                                @(Html.Kendo().Button()
+                                .Name("LuuDoiCV")
+                                .Content("Lưu")
+                                .HtmlAttributes(new { type = "button", @class = "k-button" , style = "margin-left :300px;" })
+                                )
+
+                                @(Html.Kendo().Button()
+                                .Name("DongDoiCV")
+                                .Content("Huỷ bỏ")
+                                .HtmlAttributes(new { type = "button", @class = "k-button", style="margin-left :20px;"})
+                                )
+
+                            </center>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popup thong bao ket qua-->
+<div class="modal" id="myModalKetQua" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Thông báo </h4>
+            </div>
+            <div class="modal-body">
+                <h6 id="ketQua"> Thông báo :  </h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="idnv" name="idnv" />
+
+<!--Popup danh gia-->
+<div class="modal" id="myModalDanhGia" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Đánh giá nhân sự </h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col12">
+                            <span> Tháng * :</span>
+                            @(Html.Kendo().DropDownList()
+                                .Name("dropdownlistThangTrongNamDanhGia")
+                                .DataTextField("TenThang")
+                                .DataValueField("Id")
+                                .DataSource(source => {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllThang", "Thang");
+                                    });
+
+                                })
+                                .HtmlAttributes(new { style = "margin-left : 30px;" })
+                            )
+
+                            <span style="margin-left : 40px;"> Nhân sự : </span>
+                            <span id="tenNV" name="tenNV"> </span>
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col12">
+                            <span>
+                                Đánh giá công việc tuần
+                            </span>
+                            <br />
+                            <hr style="width:760px;" />
+                            <br />
+                            @(Html.Kendo().Grid<CoreApp.Models.eDanhGiaCVTuanModel>()
+                                .Name("GridDanhGiaTuan")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(thang => thang.tenTuan).Title("Tên tuần");
+                                    columns.Bound(thang => thang.KhoiLuongModel).ClientTemplate("#=KhoiLuongModel.tenKhoiLuong#").Title("Khối lượng");
+                                    columns.Bound(thang => thang.TienDoModel).ClientTemplate("#=TienDoModel.tenTienDo#").Title("Tiến độ");
+                                    columns.Bound(thang => thang.ChatLuongTuanModel).ClientTemplate("#=ChatLuongTuanModel.tenChatLuongTuan#").Title("Chất lượng");
+                                    columns.Bound(thang => thang.nhanXetTuan).Title("Nhận xét tuần");
+                                }
+                                    )
+                                .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(10)
+                                .ServerOperation(false)
+                                .Model(model => {
+                                    model.Id( m => m.idTuan);
+
+                                }).Read(read => read.Action("DanhGiaCongViecTuan", "QuanLyCongViec").Data("ReadDanhGiaTuan")))
+                                .Events(e =>
+                                {
+
+                                    e.Edit("onEditDanhGia");
+                                })
+                                .Pageable(page => page.PageSizes(true).Refresh(true))
+                                .Sortable()
+                                .Resizable(resize => resize.Columns(true))
+                            )
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col12">
+                            <span> Đánh giá công việc tháng </span>
+                            <br />
+                            <hr style="width:700px;" />
+                            <br />
+                            @(Html.Kendo().Grid<CoreApp.Models.eDanhGiaCVThangModel>()
+                                .Name("GridDanhGia")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(thang => thang.tenThang).Title("Tên tháng");
+                                    columns.Bound(thang => thang.KhoiLuongModel).ClientTemplate("#=KhoiLuongModel.tenKhoiLuong#").Title("Khối lượng");
+                                    columns.Bound(thang => thang.TienDoModel).ClientTemplate("#=TienDoModel.tenTienDo#").Title("Tiến độ");
+                                    columns.Bound(thang => thang.ChatLuongThangModel).ClientTemplate("#=ChatLuongThangModel.tenChatLuongThang#").Title("Chất lượng");
+                                    columns.Bound(thang => thang.nhanXetThang).Title("Nhận xét tháng");
+                                }
+                                    )
+                                .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(10)
+                                .ServerOperation(false)
+                                .Model(model => {
+                                    model.Id( m => m.idThang);
+
+                                }).Read(read => read.Action("DanhGiaCongViecThang", "QuanLyCongViec").Data("ReadDanhGiaThang")))
+                                .Pageable(page => page.PageSizes(true).Refresh(true))
+                                .Sortable()
+                                .Resizable(resize => resize.Columns(true))
+                            )
+                            <br />
+                            <br />
+                            <center>
+                                @(Html.Kendo().Button()
+                                    .Name("LuuDanhGia")
+                                    .Content("Lưu")
+                                    .HtmlAttributes(new { type = "button", @class = "k-button"})
+                                )
+                                @(Html.Kendo().Button()
+                                    .Name("DongDanhGia")
+                                    .Content("Đóng")
+                                    .HtmlAttributes(new { type = "button", @class = "k-button"})
+                                )
+                            </center>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+
+        $.extend(true, kendo.ui.validator, {
+            rules: {
+                productnamevalidation: function (input) {
+                    if (input.is("[name=urlIssue]") && input.val()) {
+                        input.attr("data-productnamevalidation-msg", "Không được để khoảng trắng");
+                        return /^[A-Za-z]/.test(input.val());
+                    }
+                    return true;
+                },
+                ghiChuvalidation: function (input) {
+                    if (input.is("[name=ghiChu]") && input.val()) {
+                        input.attr("data-ghiChuvalidation-msg", "Không được để khoảng trắng");
+                        return /^[A-Za-z]/.test(input.val());
+                    }
+                    return true;
+                }
+            }
+        });
+
+        $("#LuuDoiCV").click(function () {
+            var listGiaoViec = [];
+            var superGrid = $("#grid1").data("kendoGrid");
+            var selectRows = superGrid.select();
+            $.each(selectRows, function () {
+                var row = $(this);
+                var dataItem = superGrid.dataItem(row);
+                listGiaoViec.push(dataItem.idGiaoViec);
+                console.log("list giao viec : " + typeof dataItem.denNgay);
+            })
+
+            @*$.ajax({
+               url: "@Url.Action("DoiCongViecTuan", "QuanLyCongViec")",
+                type: "Post",
+                dataType: "json",
+                async: false,
+                data: { listGiaoViec: listGiaoViec},
+                success: function (res) {
+
+                }
+            });*@
+        });
+
+        $("#DongDoiCV").click(function () {
+            $("#tuNgayDoiCV").val('');
+            $("#denNgayDoiCV").val('');
+            $("#myModalDoiCongViec").modal('hide');
+        });
+
+
+        $("#DongDanhGia").click(function () {
+            $("#myModalDanhGia").modal("hide");
+        });
+
+        $("#LuuDanhGia").click(function () {
+            var ListModelThang = [];
+            var ListModelTuan = [];
+
+            var data1 = $("#GridDanhGiaTuan").data("kendoGrid");
+            var items1 = data1.dataSource.data();
+            for (var i = 0; i < items1.length; i++) {
+                var k = JSON.stringify(items1[i]);
+                ListModelTuan.push({ "idCongViecTuan": items1[i].idCongViecTuan ,"idTuan": items1[i].idTuan, "tenTuan": items1[i].tenTuan, "KhoiLuongModel": { "giaTrikhoiLuong": items1[i].KhoiLuongModel.giaTrikhoiLuong, "tenKhoiLuong": items1[i].KhoiLuongModel.tenKhoiLuong }, "TienDoModel": { "giaTriTienDo": items1[i].TienDoModel.giaTriTienDo, "tenTienDo": items1[i].TienDoModel.tenTienDo }, "ChatLuongTuanModel": { "giaTriChatLuongTuan": items1[i].ChatLuongTuanModel.giaTriChatLuongTuan, "tenChatLuongTuan": items1[i].ChatLuongTuanModel.tenChatLuongTuan }, "nhanXetTuan": items1[i].nhanXetTuan });
+                console.log("k " + k);
+            }
+
+            var data = $("#GridDanhGia").data("kendoGrid");
+            var items = data.dataSource.data();
+            for (var i = 0; i < items.length; i++) {
+                var item = JSON.stringify(items[i]);
+                ListModelThang.push({ "idThang": items[i].idThang, "tenThang": items[i].tenThang, "KhoiLuongModel": { "giaTrikhoiLuong": items[i].KhoiLuongModel.giaTrikhoiLuong, "tenKhoiLuong": items[i].KhoiLuongModel.tenKhoiLuong }, "TienDoModel": { "giaTriTienDo": items[i].TienDoModel.giaTriTienDo, "tenTienDo": items[i].TienDoModel.tenTienDo }, "ChatLuongThangModel": { "giaTriChatLuongThang": items[i].ChatLuongThangModel.giaTriChatLuongThang, "tenChatLuongThang": items[i].ChatLuongThangModel.tenChatLuongThang }, "nhanXetThang": items[i].nhanXetThang });
+                console.log("item : " + JSON.stringify(items));
+            }
+
+            $.ajax({
+               url: "@Url.Action("CapNhatDanhGiaTuan", "Tuan")",
+                type: "Post",
+                dataType: "json",
+                async: false,
+                data: { models: ListModelTuan, idNhanVien : $("#idnv").val()},
+                success: function (res) {
+                    
+                }
+            });
+
+            $.ajax({
+               url: "@Url.Action("CapNhatDanhGiaThang", "Thang")",
+                type: "Post",
+                dataType: "json",
+                async : false,
+                data: { models: ListModelThang, idNhanVien : $("#idnv").val()},
+                success: function (res) {
+
+                }
+            });
+        });
+
+        $("#testShow").hide();
+        $.ajax({
+            url: "@Url.Action("danhSachTenCongViec", "QuanLyCongViec")",
+            success: function (res) {
+                var data = [];
+                data = res;
+                $("#tenCongViecIndex").kendoAutoComplete({
+                    dataSource: data
+                });
+            }
+        })
+
+
+    });
+
+    @*function ReadIdNSThang() {
+        return {
+            idNhanSu: 0,
+            idThang : 0
+        }
+    }*@
+
+    function OpenPopupDanhGia(x) {
+        var dropdown = $("#dropdownlistThangTrongNamDanhGia").data("kendoDropDownList");
+        var thang = $("#dropdownlistThangTrongNamIndex").val();
+        console.log("x : " + x);
+
+        var e = document.getElementById("idnv").value;
+        e = x;
+        console.log("e : " + ReadDanhGiaThang());
+        dropdown.value(thang);
+        $.ajax({
+            url: "@Url.Action("TimTenNhanSu", "NhanSu")",
+            type:"Post",
+            data: { idNhanSu: x },
+            async: false,
+            success: function (res) {
+                document.getElementById("tenNV").textContent = "";
+                document.getElementById("tenNV").textContent += res;
+                document.getElementById("idnv").value = x;
+            }
+        });
+
+        $.ajax({
+            url: "@Url.Action("DanhGiaCongViecTuan", "QuanLyCongViec")",
+            type: "Post",
+            data: ReadDanhGiaTuan(),
+            async : false,
+            success: function (res) {
+                //console.log("res :" + JSON.stringify(res));
+                @*$("#GridDanhGia").data("kendoGrid").dataSource.data(res);*@
+
+                var dataSource = new kendo.data.DataSource({ data: res });
+
+                @*grid.data(dataSource);
+                grid.refresh();*@
+                $('#GridDanhGiaTuan').data('kendoGrid').dataSource.read();
+                $('#GridDanhGiaTuan').data('kendoGrid').refresh();
+                @*dataSource.read();
+                grid.data(dataSource);*@
+            }
+        });
+
+        $.ajax({
+            url: "@Url.Action("DanhGiaCongViecThang", "QuanLyCongViec")",
+            type: "Post",
+            data: ReadDanhGiaThang(),
+            async : false,
+            success: function (res) {
+                //console.log("res :" + JSON.stringify(res));
+                @*$("#GridDanhGia").data("kendoGrid").dataSource.data(res);*@
+
+                var dataSource = new kendo.data.DataSource({ data: res });
+
+                @*grid.data(dataSource);
+                grid.refresh();*@
+                $('#GridDanhGia').data('kendoGrid').dataSource.read();
+                $('#GridDanhGia').data('kendoGrid').refresh();
+                $("#myModalDanhGia").modal("show");
+                @*dataSource.read();
+                grid.data(dataSource);*@
+            }
+        });
+
+
+
+
+
+    }
+
+    function ReadDanhGiaThang() {
+        return {
+            idNhanSu: $("#idnv").val(),
+            idThang: $("#dropdownlistThangTrongNamIndex").val(),
+            idTuan : $("#dropdownlistTuanIndex").val()
+        }
+    }
+
+    function ReadDanhGiaTuan() {
+        return {
+            idNhanSu: $("#idnv").val(),
+            idThang: $("#dropdownlistThangTrongNamIndex").val(),
+        }
+    }
+
+
+    $("#KhoaMoTuan").click(function () {
+        $.ajax({
+            url: "@Url.Action("MoKhoaTuan", "Tuan")",
+            type: "POST",
+            data: { idTuan: $("#dropdownlistTuanIndex").val()},
+            success: function (res) {
+                let idTag = document.getElementById("ketQua");
+                var data = res.message;
+                idTag.innerHTML = data;
+                $("#myModalKetQua").modal("show");
+                setTimeout(function () {
+                    $('#myModalKetQua').modal('hide');
+                }, 3000)
+                $('#grid1').data('kendoGrid').dataSource.read();
+                $('#grid1').data('kendoGrid').refresh();
+            }
+        })
+    })
+
+
+    $("#Xoa").click(function ()
+    {
+        var listIdGiaoViec = [];
+        var superGrid = $("#grid1").data("kendoGrid");
+        var selectRows = superGrid.select();
+        if (confirm("Bạn có chắc chắn xoá?")) {
+            $.each(selectRows, function () {
+                var row = $(this);
+                var dataItem = superGrid.dataItem(row);
+                @*console.log(dataItem.idNhanVien)*@
+                listIdGiaoViec.push(dataItem.idGiaoViec);
+            })
+
+            $.ajax({
+                url: "@Url.Action("XoaCongViec", "QuanLyCongViec")",
+                type: "POST",
+                data: { listIdGiaoViec: listIdGiaoViec, idTuan: $("#dropdownlistTuanIndex").val() },
+                success: function (res) {
+                    if (res.success == true) {
+                        let idTag = document.getElementById("ketQua");
+                        var data = res.message;
+                        idTag.innerHTML = data;
+                        var autocomplete = $("#tenCongViecIndex").data("kendoAutoComplete");
+                        autocomplete.refresh();
+                        $("#myModalKetQua").modal("show");
+                        setTimeout(function () {
+                            $('#myModalKetQua').modal('hide');
+                        }, 3000);
+
+
+                    }
+                    else {
+                        let idTag = document.getElementById("ketQua");
+                        var data = res.message;
+                        idTag.innerHTML = data;
+                        $("#myModalKetQua").modal("show");
+                        setTimeout(function () {
+                            $('#myModalKetQua').modal('hide');
+                        }, 3000)
+                    }
+
+                }
+            })
+        }
+        else
+        {
+            if (listIdGiaoViec.length == 0) {
+                let idTag = document.getElementById("ketQua");
+                var data = "Vui lòng chọn task để xoá";
+                idTag.innerHTML = data;
+                $("#myModalKetQua").modal("show");
+                setTimeout(function () {
+                    $('#myModalKetQua').modal('hide');
+                }, 3000)
+            }
+        }
+
+    })
+
+    function onEditDanhGia(e) {
+        
+        if (e.model.idCongViecTuan == -1) {
+            this.closeCell();
+        }
+    }
+
+    function onDataBound(e) {
+        
+        var dataItem1 = this.dataItem($(e.currentTarget).closest("tr"));
+        var grid = $("#grid1").data("kendoGrid");
+        var rows = grid.items();
+        var row = rows[0];
+        if (row != undefined) {
+            var dataItem = grid.dataItem(row);
+            if (dataItem.isDaKhoa == true) {
+                const btn = document.getElementById("KhoaMoTuan");
+                btn.innerText = "Mở Khoá";
+            }
+            else {
+                const btn = document.getElementById("KhoaMoTuan");
+                btn.innerText = "Khoá";
+            }
+        }
+        
+
+
+        var listIdTest = [];
+        var i = 1;
+        $.ajax({
+            url: "@Url.Action("danhSachIdNhanSu", "NhanSu")",
+            type: "POST",
+            data: { idThang: $("#dropdownlistThangTrongNamIndex").val(), idTuan: $("#dropdownlistTuanIndex").val() },
+            async: false,
+            success: function (res) {
+                console.log("res : " + res[i]);
+                var listId = res;
+                listIdTest = res;
+                console.log("danh sach " + listId.length);
+                var k = 0;
+                $(".k-grouping-row").each(function (e) {
+                    k++;
+
+                });
+                console.log("Gia tri k : " + k);
+
+                if (k == 1) {
+                    var id = 0;
+                    console.log("Gia tri k :" + k);
+                    $(".k-grouping-row").each(function (e) {
+                        var grid3 = $("#grid1").data("kendoGrid");
+                        var rows3 = grid3.items();
+                        for (var i = 0; i < rows3.length; i++) {
+                            var row2 = rows3[i];
+                            var d = grid3.dataItem(row2);
+                            id = d.idNhanVien;
+                        }
+                        console.log("K = 1 va id nhan vien :" +id);
+                        var current = $(this).closest(".k-grouping-row");
+                        console.log("Current length :" + current.length);
+                        console.log("Id nhan su :" + typeof listId[e]);
+
+                        //Create DOM Tag a va tag input
+                        var ele = document.createElement("input");
+                        var tagA = document.createElement("a");
+                        //var tagSpan = document.createElement("span");
+                        //set id va class
+                        //tagSpan.classList.add("material-icons-outlined");
+                        tagA.setAttribute("id", +id);
+                        tagA.innerHTML = "Đánh giá";
+                        tagA.classList.add("classTagA");
+
+                        ele.type = "checkbox";
+                        ele.classList.add("abc");
+                        console.log("list id :" + listId[e]);
+                        ele.setAttribute("id", `${id}`);
+
+                        //add len table
+
+                        current.children("td")[0].prepend(ele);
+                        current.children("td")[7].prepend(tagA);
+                        //current.children("td")[7].prepend(tagSpan);
+                        tagA.addEventListener('click', function () {
+                            OpenPopupDanhGia(listId[e]);
+                        });
+                        i++;
+
+
+
+                    });
+                }
+                //Vong lap theo tr
+
+                else {
+                    $(".k-grouping-row").each(function (e) {
+                        var current = $(this).closest(".k-grouping-row");
+                        console.log("Current length :" + current.length);
+                        console.log("Id nhan su :" + typeof listId[e]);
+
+                        //Create DOM Tag a va tag input
+                        var ele = document.createElement("input");
+                        var tagA = document.createElement("a");
+                        //var tagSpan = document.createElement("span");
+                        //set id va class
+                        //tagSpan.classList.add("material-icons-outlined");
+                        tagA.setAttribute("id", +listId[e]);
+                        tagA.innerHTML = "Đánh giá";
+                        tagA.classList.add("classTagA");
+
+                        ele.type = "checkbox";
+                        ele.classList.add("abc");
+                        console.log("list id :" + listId[e]);
+                        ele.setAttribute("id", `${listId[e]}`);
+
+                        //add len table
+
+                        current.children("td")[0].prepend(ele);
+                        current.children("td")[7].prepend(tagA);
+                        //current.children("td")[7].prepend(tagSpan);
+                        tagA.addEventListener('click', function () {
+                            OpenPopupDanhGia(listId[e]);
+                        });
+                        i++;
+
+
+
+                    });
+                }
+                
+
+                var grid2 = $("#grid1").data("kendoGrid");
+                var rows2 = grid2.items();
+                for (var i = 0; i < rows2.length; i++) {
+                    var row1 = rows2[i];
+                    var d = grid2.dataItem(row1);
+                    if (d.isDaDuyet == true) {
+                        @*var s = d.idNhanVien+"";
+                        console.log("s : " + s + " - " + typeof s);*@
+                        document.getElementById(`${d.idNhanVien}`).checked = true;
+                        //console.log("d :" + d.isDaDuyet + " - " + d.idNhanVien);
+                    }
+                }
+
+            }
+        })
+        console.log("list test : " + listIdTest.length);
+        @*$('#grid1').data('kendoGrid').dataSource.read();
+        $('#grid1').data('kendoGrid').refresh();*@
+        @*var masterRow = grid.element.find(".k-master-row");
+        for (var i = 0; i < masterRow.length; i++) {
+            console.log("data " + masterRow[i]);
+        }*@
+
+         //document.getElementById("myCheck").checked = true;
+                    //document.getElementById("myCheck").disabled = true;
+                    //console.log(current.children("td")[1]);
+
+    }
+
+
+
+
+    function TimKiemIndex() {
+        return {
+            tenCongViecIndex: $("#tenCongViecIndex").val(),
+            dropdownlistThangTrongNamIndex: $("#dropdownlistThangTrongNamIndex").val(),
+            dropdownlistTuanIndex: $("#dropdownlistTuanIndex").val(),
+            dropdownlistModuleIndex: $("#dropdownlistModuleIndex").val(),
+            dropdownlistNhanSuIndex: $("#dropdownlistNhanSuIndex").val(),
+            dropdownlistLamViecIndex: $("#dropdownlistLamViecIndex").val()
+
+        }
+    }
+
+    function filterMonth() {
+
+        return {
+            dropdownlistThangTrongNam: $("#dropdownlistThangTrongNam").val()
+        };
+    }
+
+    function filterMonthDoiCV() {
+
+        return {
+            dropdownlistThangTrongNam: $("#dropdownlistThangTrongNamDoiCV").val()
+        };
+    }
+
+    function filterMonthCapNhat() {
+
+        return {
+            dropdownlistThangTrongNam: $("#dropdownlistThangTrongNamCapNhat").val()
+        };
+    }
+
+    function filterMonthIndex() {
+
+        return {
+            dropdownlistThangTrongNam: $("#dropdownlistThangTrongNamIndex").val()
+        };
+    }
+
+    function ThemViec() {
+        return {
+            dropdownlistNhanSu: $("#dropdownlistNhanSu").val(),
+            dropdownlistThangTrongNam: $("#dropdownlistThangTrongNam").val(),
+            dropdownlistTuan: $("#dropdownlistTuan").val(),
+            dropdownlistModule: $("#dropdownlistModule").val(),
+            tenCongViec: $("#tenCongViec").val(),
+            urlIssusse: $("#urlIssusse").val(),
+            tenIssusse: $("#tenIssusse").val(),
+            thoiGianLam: $("#thoiGianLam").val(),
+            dropdownlistLamViec: $("#dropdownlistLamViec").val(),
+            tuNgay: $("#tuNgay").val(),
+            denNgay : $("#denNgay").val(),
+            ghiChu: $("#ghiChu").val()
+        };
+    }
+
+    function CapNhatGiaoViec() {
+        return {
+            dropdownlistNhanSuCapNhat: $("#dropdownlistNhanSuCapNhat").val(),
+            dropdownlistThangTrongNamCapNhat: $("#dropdownlistThangTrongNamCapNhat").val(),
+            dropdownlistTuanCapNhat: $("#dropdownlistTuanCapNhat").val(),
+            dropdownlistModuleCapNhat: $("#dropdownlistModuleCapNhat").val(),
+            tenCongViecCapNhat: $("#tenCongViecCapNhat").val(),
+            urlIssusseCapNhat: $("#urlIssusseCapNhat").val(),
+            tenIssusseCapNhat: $("#tenIssusseCapNhat").val(),
+            thoiGianLamCapNhat: $("#thoiGianLamCapNhat").val(),
+            dropdownlistLamViecCapNhat: $("#dropdownlistLamViecCapNhat").val(),
+            tuNgayCapNhat: $("#tuNgayCapNhat").val(),
+            denNgayCapNhat: $("#denNgayCapNhat").val(),
+            ghiChuCapNhat: $("#ghiChuCapNhat").val(),
+            idGiaoViecCapNhat : $("#idGiaoViecCapNhat").val()
+        };
+    }
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+    }
+
+    $("#Luu").click(function () {
+
+        const btn = document.getElementById("KhoaMoTuan");
+        var txt = btn.textContent || btn.innerText;
+
+        if (txt === "Mở Khoá") {
+            let idTag = document.getElementById("ketQua");
+            var data = "Đã khoá tuần không thể cập nhật";
+            idTag.innerHTML = data;
+            $("#myModalKetQua").modal("show");
+            setTimeout(function () {
+                $('#myModalKetQua').modal('hide');
+            }, 3000)
+        }
+        else {
+            var ListModel = [];
+            var data = $("#grid1").data("kendoGrid");
+            var items = data.dataSource.data();
+            for (var i = 0; i < items.length; i++)
+            {
+                var item = JSON.stringify(items[i]);
+                console.log("item " + item);
+                var tuNgay1 = formatDate(items[i].tuNgay);
+                var denNgay1 = formatDate(items[i].denNgay);
+                console.log("tu ngay :" + tuNgay1);
+                ListModel.push({ "idNhanVien": items[i].idNhanVien, "tenNhanVien": items[i].tenNhanVien, "idGiaoViec": items[i].idGiaoViec, "Dev": items[i].Dev, "urlIssue": items[i].urlIssue, "tenCongViec": items[i].tenCongViec, "thoiGianLam": items[i].thoiGianLam, "tuNgay": tuNgay1, "denNgay": denNgay1, "giaTriENumNguonGoc": items[i].giaTriENumNguonGoc, "giaTriEnumTrangThai": items[i].giaTriEnumTrangThai, "idModule": items[i].idModule, "mucDoHoanThanh": items[i].mucDoHoanThanh, "isDaDuyet": items[i].isDaDuyet, "isDaKhoa": items[i].isDaKhoa, "NguonGocModel": { "giaTriNguonGoc": items[i].NguonGocModel.giaTriNguonGoc, "tenNguonGoc": items[i].NguonGocModel.tenNguonGoc }, "TrangThaiCongViecModel": { "giaTriTrangThai": items[i].TrangThaiCongViecModel.giaTriNguonGoc, "tenTrangThai": items[i].TrangThaiCongViecModel.tenTrangThai }, "eDmModuleModel": { "Id": items[i].eDmModuleModel.Id, "TenModule": items[i].eDmModuleModel.TenModule }, "ghiChu": items[i].ghiChu });
+                console.log("List model " + ListModel[i]);
+            }
+
+
+        $.ajax({
+            url: "@Url.Action("EditingCongViec_Update", "QuanLyCongViec")",
+            type: "POST",
+            data: { models: ListModel },
+            async: false,
+            success: function (res) {
+
+                @*var grid = $('#grid1').data("kendoGrid");
+                dataSource.read();
+                grid.data(dataSource);*@
+                $('#grid1').data('kendoGrid').dataSource.read();
+                $('#grid1').data('kendoGrid').refresh();
+
+            }
+
+        })
+        @*var myJson = JSON.stringify(data);
+        console.log("json " + myJson);*@
+        }
+
+        @*$('#grid1').data('kendoGrid').dataSource.read();
+        $('#grid1').data('kendoGrid').refresh();*@
+    })
+
+
+
+    $("#LuuVaDong").click(function () {
+
+        $.ajax({
+            url: "@Url.Action("ThemCongViecGiao", "QuanLyCongViec")",
+            type: 'POST',
+            data: ThemViec(),
+            success: function (res) {
+                if (res.success == true) {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    ClearSave();
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                    $('#grid1').data('kendoGrid').dataSource.read();
+                    $('#grid1').data('kendoGrid').refresh();
+                    $("#myModal").modal('hide');
+                }
+                else {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+
+                }
+            }
+        })
+
+    });
+
+    $("#LuuVaThem").click(function () {
+        $.ajax({
+            url: "@Url.Action("ThemCongViecGiao", "QuanLyCongViec")",
+            type: 'POST',
+            data: ThemViec(),
+            success: function (res) {
+                if (res.success == true) {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    //ClearSave();
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                    $('#grid1').data('kendoGrid').dataSource.read();
+                    $('#grid1').data('kendoGrid').refresh();
+                }
+                else {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                }
+            }
+        })
+    });
+
+    $("#timNangCao").click(function () {
+        var element = document.getElementById("testShow");
+        element.style.display = "inline-block";
+
+    });
+
+    $("#tim").click(function () {
+        $.ajax({
+            url: "@Url.Action("TimKiem", "QuanLyCongViec")",
+            dataType: "json",
+            //cache: false,
+            data: TimKiemIndex(),
+            success: function (res) {
+                if (res.success == false) {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                    $("#myModal").modal('hide');
+                }
+                else {
+                    @*console.log("data res " + JSON.stringify(res));
+                    var dataSource = new kendo.data.DataSource({ data: res });
+                    var grid = $("#grid1").data("kendoGrid");*@
+
+                    //$('#grid1').data("kendoGrid").dataSource.read();
+
+                    @*var grid = $("#grid1").kendoGrid({ dataSource: res });
+                    grid.dataSource.read();*@
+
+                    $('#grid1').data('kendoGrid').dataSource.read();
+                    $('#grid1').data('kendoGrid').refresh();
+
+
+                    @*grid.dataSource.read();
+                    grid.setDataSource(dataSource);*@
+                }
+            }
+
+        })
+        @*$('#grid1').data('kendoGrid').dataSource.read();*@
+        //$('#grid1').data('kendoGrid').refresh();
+
+    });
+
+    function onEdit(e) {
+        console.log("on edit ");
+        var dropDown = e.container.find("[name='TrangThaiCongViecModel']").data("kendoDropDownList");
+        if (e.model.isDaKhoa == true) {
+            this.closeCell();
+        }
+        if (e.model.isDaDuyet == false && e.model.isDaKhoa == false) {
+            dropDown.readonly();
+
+        }
+
+        @*else {
+            this.closeCell();
+        }*@
+
+
+        @*else {
+            this.closeCell();
+        }*@
+            @*this.closeCell(1);
+            console.log(e.model);*@
+        //var dropDown = e.container.find("[data-role='dropdownlist']").data("kendoDropDownList");
+        //if (dropDown && e.model.thoiGianLam == 4) {
+                //this.closeCell();
+
+            //dropDown.readonly();
+        //}
+            //e.container.find("input[name='thoiGianLam']").attr('disabled', true)
+
+
+    }
+
+    $("#DuyetKeHoachTuan").click(function () {
+        var chkArray = [];
+        var chkArray1 = [];
+
+        $checkbox = $('.abc');
+        chkArray = $.map($checkbox, function (el) {
+            if (el.checked) { return el.id };
+        });
+        @*console.log("Length chkArray : " + chkArray.length);
+
+              for (var i = 0; i < chkArray.length; i++)
+        {
+            console.log(" type of " + typeof chkArray);
+            console.log(" type of item  " + typeof chkArray[i]);
+            chkArray1.push(chkArray[i]);
+            console.log(" value " +chkArray[i]);
+        }
+        console.log("type of :" + typeof chkArray1);*@
+        $.ajax({
+            url: "@Url.Action("DuyetTuan", "QuanLyCongViec")",
+            type: 'POST',
+            data: {
+                chkArray: chkArray,
+                idThang : $("#dropdownlistThangTrongNamIndex").val(),
+                idTuan: $("#dropdownlistTuanIndex").val(),
+
+            },
+            success: function (res) {
+                if (res.success == false) {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.listError;
+                    idTag.innerHTML = data;
+                    $("#myModalKetQua").modal("show");
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000)
+                }
+                else {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    $("#myModalKetQua").modal("show");
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000)
+                }
+            }
+        })
+
+    });
+
+    $("#Them").click(function () {
+        const btn = document.getElementById("KhoaMoTuan");
+        var txt = btn.textContent || btn.innerText;
+        OpenDropdownlist();
+        if (txt === "Khoá") {
+            var dropdownlistTrangThai = $("#dropdownlistLamViec").data("kendoDropDownList");
+            dropdownlistTrangThai.readonly();
+            $("#myModal").modal("show");
+        }
+        else {
+            let idTag = document.getElementById("ketQua");
+            var data = "Đã khoá tuần không thể thêm";
+            idTag.innerHTML = data;
+            $("#myModalKetQua").modal("show");
+            setTimeout(function () {
+                $('#myModalKetQua').modal('hide');
+            }, 3000)
+
+        }
+    })
+
+    $("#Dong").click(function () {
+        ClearSave();
+    });
+
+    $("#DoiCongViec").click(function () {
+        var listIdGiaoViec = [];
+        var trangThai = -1;
+        var superGrid = $("#grid1").data("kendoGrid");
+        var selectRows = superGrid.select();
+        $.each(selectRows, function () {
+            var row = $(this);
+            var dataItem = superGrid.dataItem(row);
+            trangThai = dataItem.giaTriEnumTrangThai;
+            listIdGiaoViec.push(dataItem.idGiaoViec);
+        })
+        console.log("Trang thai " + trangThai);
+        if (listIdGiaoViec.length == 0 ) {
+            let idTag = document.getElementById("ketQua");
+            var data = "Vui lòng chọn 1 công việc";
+            idTag.innerHTML = data;
+            $("#myModalKetQua").modal("show");
+            setTimeout(function () {
+                $('#myModalKetQua').modal('hide');
+            }, 3000)
+        }
+        else if (listIdGiaoViec.length >= 2)
+        {
+            let idTag = document.getElementById("ketQua");
+            var data = "Vui lòng chỉ chọn 1 công việc và trạng thái là chưa xong";
+            idTag.innerHTML = data;
+            $("#myModalKetQua").modal("show");
+            setTimeout(function () {
+                $('#myModalKetQua').modal('hide');
+            }, 3000)
+        }
+        else if (trangThai != 3)
+        {
+            let idTag = document.getElementById("ketQua");
+            var data = "Vui lòng chỉ chọn 1 công việc và trạng thái là chưa xong hoặc bận task khác đã duyệt (chưa duyệt)";
+            idTag.innerHTML = data;
+            $("#myModalKetQua").modal("show");
+            setTimeout(function () {
+                $('#myModalKetQua').modal('hide');
+            }, 3000)
+        }
+        else {
+            $("#myModalDoiCongViec").modal("show");
+        }
+
+    });
+
+    function CapNhatPromo(e) {
+        const btn = document.getElementById("KhoaMoTuan");
+        var txt = btn.textContent || btn.innerText;
+        if (txt === "Mở Khoá") {
+            let idTag = document.getElementById("ketQua");
+            var data = "Đã khoá tuần không thể cập nhật";
+            idTag.innerHTML = data;
+            $("#myModalKetQua").modal("show");
+            setTimeout(function () {
+                $('#myModalKetQua').modal('hide');
+            }, 3000)
+        }
+        else {
+
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            var dropdownlist = $("#dropdownlistNhanSuCapNhat").data("kendoDropDownList");
+            var dropdownlistThang = $("#dropdownlistThangTrongNamCapNhat").data("kendoDropDownList");
+            var dropdownlistTrangThai = $("#dropdownlistLamViecCapNhat").data("kendoDropDownList");
+            dropdownlist.readonly();
+            dropdownlistThang.readonly();
+            if (dataItem.isDaDuyet == false) {
+                dropdownlistTrangThai.readonly();
+            }
+            else {
+                dropdownlistTrangThai.enable(true);
+            }
+            $("#dropdownlistNhanSuCapNhat").data('kendoDropDownList').value(dataItem.idNhanVien);
+            $("#dropdownlistThangTrongNamCapNhat").data('kendoDropDownList').value($("#dropdownlistThangTrongNam").val());
+            $("#dropdownlistTuanCapNhat").data('kendoDropDownList').value($("#dropdownlistTuan").val());
+            $("#dropdownlistModuleCapNhat").data('kendoDropDownList').value(dataItem.idModule);
+            $("#tenCongViecCapNhat").val(dataItem.tenCongViec);
+            $("#thoiGianLamCapNhat").val(dataItem.thoiGianLam);
+            $("#dropdownlistLamViecCapNhat").data('kendoDropDownList').value(dataItem.TrangThaiCongViecModel.giaTriTrangThai);
+            $("#urlIssusseCapNhat").val(dataItem.urlIssue);
+            var tuNgay1 = formatDate(dataItem.tuNgay);
+            var denNgay1 = formatDate(dataItem.denNgay);
+            $("#tuNgayCapNhat").val(tuNgay1);
+            $("#denNgayCapNhat").val(denNgay1);
+            $("#ghiChuCapNhat").val(dataItem.ghiChu);
+            $("#idGiaoViecCapNhat").val(dataItem.idGiaoViec);
+            $("#myModalCapNhat").modal('show');
+        }
+
+    }
+
+    $("#LuuVaDongCapNhat").click(function () {
+        console.log("Da vo day cap nhat :");
+        $.ajax({
+            url: "@Url.Action("CapNhatCongViecGiao", "QuanLyCongViec")",
+            type: 'POST',
+            data: CapNhatGiaoViec(),
+            success: function (res) {
+                if (res.success == true) {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    ClearSave();
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                    $("#myModalCapNhat").modal('hide');
+                    $('#grid1').data('kendoGrid').dataSource.read();
+                    $('#grid1').data('kendoGrid').refresh();
+                }
+                else {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+
+                }
+            }
+        })
+        $('#grid1').data('kendoGrid').dataSource.read();
+        $('#grid1').data('kendoGrid').refresh();
+    })
+
+    $("#LuuVaThemCapNhat").click(function () {
+        $.ajax({
+            url: "@Url.Action("CapNhatCongViecGiao", "QuanLyCongViec")",
+            type: 'POST',
+            data: CapNhatGiaoViec(),
+            success: function (res) {
+                if (res.success == true) {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    ClearSave();
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                    $("#myModalCapNhat").modal('hide');
+                    $('#grid1').data('kendoGrid').dataSource.read();
+                    $('#grid1').data('kendoGrid').refresh();
+                }
+                else {
+                    let idTag = document.getElementById("ketQua");
+                    var data = res.message;
+                    idTag.innerHTML = data;
+                    console.log("res" + res.message);
+                    $("#myModalKetQua").modal("show");
+                    setTimeout(function () {
+                        $('#myModalKetQua').modal('hide');
+                    }, 3000);
+                }
+            }
+        })
+    });
+
+    $("#DongCapNhat").click(function () {
+        ClearSaveCapNhat();
+    });
+
+    function ClearSave() {
+        @*$("#dropdownlistNhanSu").data('kendoDropDownList').dataSource.read();
+        $("#dropdownlistThangTrongNam").data('kendoDropDownList').value($("#dropdownlistThangTrongNam").val());
+        $("#dropdownlistTuan").data('kendoDropDownList').value($("#dropdownlistTuan").val());
+        $("#dropdownlistModule").data('kendoDropDownList').value(dataItem.idModule);*@
+        $("#tenCongViec").val('');
+        $("#thoiGianLam").val('');
+        @*$("#dropdownlistLamViec").data('kendoDropDownList').value(dataItem.TrangThaiCongViecModel.giaTriTrangThai);*@
+        $("#urlIssusse").val('');
+        $("#tuNgay").val('');
+        $("#denNgay").val('');
+        $("#ghiChu").val('');
+        $("#myModal").modal('hide');
+    }
+
+    function ClearSaveCapNhat() {
+        $("#myModalCapNhat").modal('hide');
+    }
+
+    function OpenDropdownlist() {
+        var dropdownlist = $("#dropdownlistNhanSu").data("kendoDropDownList");
+        var dropdownlistThang = $("#dropdownlistThangTrongNam").data("kendoDropDownList");
+        var dropdownlistTrangThai = $("#dropdownlistLamViec").data("kendoDropDownList");
+        dropdownlist.enable(true);
+        dropdownlistThang.enable(true);
+        dropdownlistTrangThai.enable(true);
+    }
+
+
+
+</script>
+
+<script type="text/javascript">function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }</script>
